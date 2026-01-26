@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Rank Test Cloud</title>
+</head>
+<body>
+
+<h1>Rank actuel : <span id="rankLabel">?</span></h1>
+
+<button id="btnUp">Promouvoir</button>
+
+<script>
+    /* ======================
+       CONFIG
+    ====================== */
+    const EDIT_PASSWORD = "sombremerde";
+
+    const RANKS = [
+        "enorme",
+        "grosse",
+        "mediane",
+        "petite",
+        "merde",
+        "bad",
+        "mid",
+        "ok",
+        "good",
+        "boss"
+    ];
+
+    let state = {
+        rankId: "enorme"
+    };
+
+    /* ======================
+       CLOUD
+    ====================== */
+    async function loadCloud() {
+        const r = await fetch("/.netlify/functions/get-state");
+        const data = await r.json();
+        state.rankId = data.rankId;
+        render();
+    }
+
+    async function saveCloud() {
+        await fetch("/.netlify/functions/set-state", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-EDIT-PASS": EDIT_PASSWORD
+            },
+            body: JSON.stringify({
+                rankId: state.rankId,
+                iconsById: {}
+            })
+        });
+    }
+
+    /* ======================
+       LOGIC
+    ====================== */
+    function render() {
+        document.getElementById("rankLabel").textContent = state.rankId;
+    }
+
+    function promote() {
+        const idx = RANKS.indexOf(state.rankId);
+        if (idx < RANKS.length - 1) {
+            state.rankId = RANKS[idx + 1];
+            render();
+            saveCloud(); // 🔴 C’EST ICI QUE LA DB EST MAJ
+        }
+    }
+
+    /* ======================
+       EVENTS
+    ====================== */
+    document.getElementById("btnUp").addEventListener("click", promote);
+
+    /* ======================
+       SYNC (voir modifs de l’autre)
+    ====================== */
+    setInterval(loadCloud, 1500);
+
+    /* ======================
+       INIT
+    ====================== */
+    loadCloud();
+
+</script>
+
+</body>
+</html>
