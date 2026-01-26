@@ -1,14 +1,16 @@
-import { sql } from "@netlify/database";
+import { neon } from "@netlify/neon";
 
 export default async () => {
-    const rows = await sql`
-        select payload
-        from rank_state
-        where id = 'main'
-            limit 1
+    const sql = neon();
+
+    const [row] = await sql`
+        SELECT payload
+        FROM rank_state
+        WHERE id = 'main'
+            LIMIT 1
     `;
 
-    return new Response(JSON.stringify(rows[0].payload), {
+    return new Response(JSON.stringify(row.payload), {
         headers: { "Content-Type": "application/json" }
     });
 };

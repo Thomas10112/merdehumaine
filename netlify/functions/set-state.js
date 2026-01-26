@@ -1,4 +1,4 @@
-import { sql } from "@netlify/database";
+import { neon } from "@netlify/neon";
 
 const EDIT_PASSWORD = "sombremerde";
 
@@ -9,11 +9,12 @@ export default async (request) => {
     }
 
     const body = await request.json();
+    const sql = neon();
 
     await sql`
-        update rank_state
-        set payload = ${body}, updated_at = now()
-        where id = 'main'
+        UPDATE rank_state
+        SET payload = ${body}, updated_at = now()
+        WHERE id = 'main'
     `;
 
     return new Response(JSON.stringify({ ok: true }), {
