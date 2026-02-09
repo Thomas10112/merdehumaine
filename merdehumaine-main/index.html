@@ -1,0 +1,923 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>⚓ Rank Manager Formation ⚓</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --success: #198754;
+            --warning: #ffc107;
+            --info: #0dcaf0;
+            --danger: #dc3545;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container-fluid {
+            padding: 2rem 1rem;
+        }
+
+        h1 {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%);
+            color: white;
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stagiaire-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stagiaire-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary);
+        }
+
+        .stagiaire-card.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .stagiaire-card.active .text-muted {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+
+        .rank-icon {
+            font-size: 32px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .stagiaire-card.active .rank-icon {
+            animation: spin 1s ease-in-out;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg) scale(1);
+            }
+            50% {
+                transform: rotate(180deg) scale(1.1);
+            }
+            100% {
+                transform: rotate(360deg) scale(1);
+            }
+        }
+
+        .badge {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn {
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        kbd {
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .grade-badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            font-weight: 700;
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.3);
+        }
+
+        .stats-card h6 {
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        .stats-card .number {
+            font-size: 2.5rem;
+        }
+
+        .rank-progress {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--success) 100%);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .no-selection {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="50" y="50" font-size="40" text-anchor="middle" dy=".3em">⚓</text></svg>');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 100px;
+            opacity: 0.1;
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+
+        .badge-text-bg-matelot {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .badge-text-bg-marine {
+            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            color: white;
+        }
+
+        .badge-text-bg-air {
+            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+            color: #0b2a4a;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container-fluid">
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>⚓ RANK MANAGER FORMATION ⚓</h1>
+            <div class="text-white small mt-2" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+                Raccourcis : <kbd>↑</kbd> promouvoir · <kbd>↓</kbd> rétrograder · <kbd>Home</kbd> min · <kbd>End</kbd>
+                max
+            </div>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="stats-card" style="margin-bottom: 0;">
+                <h6>Effectif</h6>
+                <div class="number" id="totalStagiaires">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-warning d-flex flex-wrap align-items-center gap-2 mb-3">
+        <strong>🔐 Édition :</strong>
+        <span id="lockState" class="badge text-bg-dark">Verrouillé</span>
+
+        <div class="ms-auto d-flex flex-wrap gap-2 align-items-center">
+            <input id="passInput" type="password" class="form-control form-control-sm" placeholder="mot de passe"
+                   style="width:220px;">
+            <button id="btnUnlock" class="btn btn-sm btn-primary">🔓 Déverrouiller</button>
+            <button id="btnLock" class="btn btn-sm btn-outline-dark">🔒 Verrouiller</button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-lg h-100">
+                <div class="card-header">
+                    ⚓ Stagiaires
+                </div>
+                <div class="card-body p-2" style="max-height: 700px; overflow-y: auto;">
+                    <div id="stagiairesContainer" class="d-flex flex-column gap-2"></div>
+                </div>
+                <div class="card-footer bg-light">
+                    <button id="btnAddStagiaire" class="btn btn-sm btn-success w-100 mb-2">➕ Ajouter</button>
+                    <button id="btnRemoveStagiaire" class="btn btn-sm btn-outline-danger w-100">❌ Supprimer</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-lg">
+                <div class="card-body p-4">
+
+                    <div id="noSelection" class="text-center py-5 text-muted no-selection">
+                        <p style="font-size: 1.2rem; margin-top: 100px;">📍 Sélectionnez un stagiaire</p>
+                    </div>
+
+                    <div id="editorSection" style="display:none;">
+                        <div class="d-flex align-items-center gap-4 mb-4 pb-3 border-bottom">
+                            <div id="rankIcon"
+                                 class="rounded-circle border-3 bg-white d-flex align-items-center justify-content-center rank-icon"
+                                 style="width:90px;height:90px;font-size:45px;">🏷️
+                            </div>
+
+                            <div class="flex-grow-1">
+                                <div class="text-muted small text-uppercase fw-bold">Stagiaire</div>
+                                <h3 id="stagiaireNameDisplay" class="mb-3">Nom</h3>
+
+                                <div class="mb-2">
+                                    <span id="gradeBadge" class="grade-badge"></span>
+                                </div>
+
+                                <div class="text-muted small text-uppercase fw-bold mt-3">Rank Actuel</div>
+                                <span id="rankBadge" class="badge rounded-pill fs-6 px-4 py-2"></span>
+                            </div>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <button id="btnDown" class="btn btn-outline-danger w-100">⬇ Rétrograder</button>
+                            </div>
+                            <div class="col-6">
+                                <button id="btnUp" class="btn btn-outline-success w-100">⬆ Promouvoir</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-600">Choisir un rank</label>
+                            <select id="rankSelect" class="form-select"></select>
+                        </div>
+
+                        <div class="d-flex gap-2 mb-4">
+                            <button id="btnMin" class="btn btn-outline-dark flex-grow-1">⬅ Minimum</button>
+                            <button id="btnMax" class="btn btn-outline-dark flex-grow-1">Maximum ➡</button>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="mb-3">🎖️ Changer de Grade</h5>
+                        <div class="text-muted small mb-3">Promouvoir ou rétrograder le stagiaire.</div>
+
+                        <div class="row g-2 mb-4">
+                            <div class="col-12">
+                                <label class="form-label fw-600">Nouveau grade</label>
+                                <select id="gradeSelect" class="form-select"></select>
+                            </div>
+                        </div>
+
+                        <div class="row g-2 mb-4">
+                            <div class="col-6">
+                                <button id="btnDownGrade" class="btn btn-outline-warning w-100">⬇ Rétrograder</button>
+                            </div>
+                            <div class="col-6">
+                                <button id="btnUpGrade" class="btn btn-outline-primary w-100">⬆ Promouvoir</button>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="mb-3">🎨 Personnaliser les Badges</h5>
+                        <div class="text-muted small mb-3">Assigne un emoji unique à chaque rang.</div>
+
+                        <div class="row g-2 align-items-end mb-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-600">Rang à modifier</label>
+                                <select id="badgeRankSelect" class="form-select"></select>
+                            </div>
+
+                            <div class="col-8 col-md-4">
+                                <label class="form-label fw-600">Emoji</label>
+                                <input id="badgeInput" class="form-control" maxlength="12" placeholder="ex: 💩">
+                            </div>
+
+                            <div class="col-4 col-md-2 d-grid">
+                                <button id="btnSaveBadge" class="btn btn-primary">Sauver</button>
+                            </div>
+                        </div>
+
+                        <button id="btnDefaultBadge" class="btn btn-outline-secondary btn-sm">↩ Remettre par défaut
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    /* =========================
+       CONFIG
+    ========================= */
+    const EDIT_PASSWORD = "sombremerde";
+    const STORAGE_KEY = "rank_manager_formation_v2";
+
+    /* =========================
+       RANKS BY GRADE
+    ========================= */
+    const DEFAULT_RANKS = [
+        {id: "r_bad", label: "Petite merde", cls: "text-bg-danger", defaultIcon: "!"},
+        {id: "r_mid", label: "Merde moyenne", cls: "text-bg-warning", defaultIcon: "~"},
+        {id: "r_ok", label: "Grosse merde", cls: "text-bg-info", defaultIcon: "="},
+        {id: "r_good", label: "Enorme merde", cls: "text-bg-success", defaultIcon: "+"},
+        {id: "r_excel", label: "Merde legendaire", cls: "text-bg-success", defaultIcon: "*"}
+    ];
+
+    const RANKS_BY_GRADE = {};
+
+    const SERVICES = {
+        MARINE: "Marine nationale",
+        AIR: "Armee de l'air et de l'espace"
+    };
+
+    const GRADES_BY_SERVICE = {
+        MARINE: [
+            {id: "MN_MATELOT", label: "MO2"},
+            {id: "MN_MATELOT_1CL", label: "MO1"},
+            {id: "MN_QM2", label: "QM2"},
+            {id: "MN_QM1", label: "QM1"},
+            {id: "MN_SECOND_MAITRE", label: "SM"},
+            {id: "MN_MAITRE", label: "MT"},
+            {id: "MN_PREMIER_MAITRE", label: "PM"},
+            {id: "MN_MAITRE_PRINCIPAL", label: "MP"},
+            {id: "MN_ASPIRANT", label: "ASP"},
+            {id: "MN_ENS2", label: "EV2"},
+            {id: "MN_ENS1", label: "EV1"},
+            {id: "MN_LV", label: "LV"},
+            {id: "MN_CC", label: "CC"},
+            {id: "MN_CF", label: "CF"},
+            {id: "MN_CV", label: "CV"},
+            {id: "MN_A", label: "Am"}
+        ],
+        AIR: [
+            {id: "AAE_AVIATEUR", label: "Avt"},
+            {id: "AAE_AVIATEUR_1CL", label: "Avt1"},
+            {id: "AAE_CAPORAL", label: "Cpl"},
+            {id: "AAE_CAPORAL_CHEF", label: "Cch"},
+            {id: "AAE_SERGENT", label: "Sgt"},
+            {id: "AAE_SERGENT_CHEF", label: "Sgt-chef"},
+            {id: "AAE_ADJUDANT", label: "Adj"},
+            {id: "AAE_ADJUDANT_CHEF", label: "Adj-chef"},
+            {id: "AAE_MAJOR", label: "Maj"},
+            {id: "AAE_ASPIRANT", label: "Asp"},
+            {id: "AAE_SOUS_LIEUTENANT", label: "Slt"},
+            {id: "AAE_LIEUTENANT", label: "Lt"},
+            {id: "AAE_CAPITAINE", label: "Cne"},
+            {id: "AAE_COMMANDANT", label: "Cdt"},
+            {id: "AAE_LIEUTENANT_COLONEL", label: "Lcl"},
+            {id: "AAE_COLONEL", label: "Col"},
+            {id: "AAE_GBA", label: "GBA"},
+            {id: "AAE_GDA", label: "GDA"},
+            {id: "AAE_GCA", label: "GCA"},
+            {id: "AAE_GAA", label: "GAA"}
+        ]
+    };
+
+    const DEFAULT_GRADE_ID = GRADES_BY_SERVICE.MARINE[0].id;
+
+    const GRADE_COLORS = {
+        MARINE: "badge-text-bg-marine",
+        AIR: "badge-text-bg-air"
+    };
+
+    const ALL_GRADES = [
+        ...GRADES_BY_SERVICE.MARINE.map(g => g.id),
+        ...GRADES_BY_SERVICE.AIR.map(g => g.id)
+    ];
+
+    const GRADE_META = {};
+    for (const [service, grades] of Object.entries(GRADES_BY_SERVICE)) {
+        for (const g of grades) {
+            GRADE_META[g.id] = {
+                label: g.label,
+                service,
+                cls: GRADE_COLORS[service] || "badge-text-bg-matelot"
+            };
+        }
+    }
+
+    const gradeMeta = (gradeId) => GRADE_META[gradeId] || GRADE_META[DEFAULT_GRADE_ID];
+    const gradeService = (gradeId) => gradeMeta(gradeId).service;
+    const gradeLabel = (gradeId) => gradeMeta(gradeId).label;
+    const gradeListFor = (gradeId) => {
+        const service = gradeService(gradeId);
+        return (GRADES_BY_SERVICE[service] || GRADES_BY_SERVICE.MARINE).map(g => g.id);
+    };
+
+    const byId = (id) => {
+        for (const grade in RANKS_BY_GRADE) {
+            const r = RANKS_BY_GRADE[grade].find(r => r.id === id);
+            if (r) return r;
+        }
+        const fallback = DEFAULT_RANKS.find(r => r.id === id);
+        return fallback || DEFAULT_RANKS[0];
+    };
+
+    const getRanksByGrade = (grade) => RANKS_BY_GRADE[grade] || DEFAULT_RANKS;
+
+    const idxOf = (rankId, grade) => {
+        const ranks = getRanksByGrade(grade);
+        return Math.max(0, ranks.findIndex(r => r.id === rankId));
+    };
+
+    const clamp = (i, grade) => {
+        const len = getRanksByGrade(grade).length;
+        return Math.max(0, Math.min(len - 1, i));
+    };
+
+    function normalizePass(s) {
+        return (s ?? "").toString().trim().toLowerCase().replace(/\s+/g, "");
+    }
+
+    /* =========================
+       STATE
+    ========================= */
+    const DEFAULT_STATE = {
+        locked: true,
+        selectedStagiaireId: null,
+        stagiaires: [],
+        iconsById: {}
+    };
+
+    let state = structuredClone(DEFAULT_STATE);
+
+    /* =========================
+       STORAGE
+    ========================= */
+    function safeParse(json) {
+        try {
+            return JSON.parse(json);
+        } catch {
+            return null;
+        }
+    }
+
+    function load() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const parsed = raw ? safeParse(raw) : null;
+        if (!parsed || typeof parsed !== "object") {
+            initSampleData();
+            return;
+        }
+
+        state = {...structuredClone(DEFAULT_STATE), ...parsed};
+        state.locked = !!state.locked;
+        state.stagiaires = Array.isArray(parsed.stagiaires) ? parsed.stagiaires : [];
+        state.iconsById = (parsed.iconsById && typeof parsed.iconsById === "object") ? parsed.iconsById : {};
+
+        for (const s of state.stagiaires) {
+            if (!GRADE_META[s.grade]) {
+                s.grade = DEFAULT_GRADE_ID;
+            }
+            const ranks = getRanksByGrade(s.grade);
+            if (!ranks.some(r => r.id === s.rankId)) {
+                s.rankId = ranks[0].id;
+            }
+        }
+
+        if (state.stagiaires.length === 0) initSampleData();
+    }
+
+    function initSampleData() {
+        state.stagiaires = [
+            {id: "s1", name: "ANDRIEU", grade: "MN_MATELOT", rankId: "r_mid"},
+            {id: "s2", name: "DRAILY", grade: "MN_SECOND_MAITRE", rankId: "r_mid"},
+            {id: "s3", name: "COQUEREAU", grade: "MN_SECOND_MAITRE", rankId: "r_mid"},
+            {id: "s4", name: "LECLERE", grade: "MN_SECOND_MAITRE", rankId: "r_mid"},
+            {id: "s5", name: "MEGE", grade: "MN_SECOND_MAITRE", rankId: "r_mid"},
+            {id: "s6", name: "SPINNEWYN", grade: "MN_QM1", rankId: "r_mid"},
+            {id: "s7", name: "OPUU", grade: "MN_SECOND_MAITRE", rankId: "r_mid"},
+            {id: "s8", name: "OUDGHIRI", grade: "MN_MAITRE", rankId: "r_mid"}
+        ];
+        state.selectedStagiaireId = state.stagiaires[0]?.id || null;
+    }
+
+    function save() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    /* =========================
+       DOM REFS
+    ========================= */
+    const elLockState = document.getElementById("lockState");
+    const elPassInput = document.getElementById("passInput");
+    const btnUnlock = document.getElementById("btnUnlock");
+    const btnLock = document.getElementById("btnLock");
+
+    const stagiairesContainer = document.getElementById("stagiairesContainer");
+    const btnAddStagiaire = document.getElementById("btnAddStagiaire");
+    const btnRemoveStagiaire = document.getElementById("btnRemoveStagiaire");
+
+    const noSelection = document.getElementById("noSelection");
+    const editorSection = document.getElementById("editorSection");
+
+    const elRankIcon = document.getElementById("rankIcon");
+    const elRankBadge = document.getElementById("rankBadge");
+    const stagiaireNameDisplay = document.getElementById("stagiaireNameDisplay");
+    const gradeBadge = document.getElementById("gradeBadge");
+    const totalStagiaires = document.getElementById("totalStagiaires");
+    const elSelect = document.getElementById("rankSelect");
+
+    const btnUp = document.getElementById("btnUp");
+    const btnDown = document.getElementById("btnDown");
+    const btnMin = document.getElementById("btnMin");
+    const btnMax = document.getElementById("btnMax");
+
+    const badgeRankSelect = document.getElementById("badgeRankSelect");
+    const badgeInput = document.getElementById("badgeInput");
+    const btnSaveBadge = document.getElementById("btnSaveBadge");
+    const btnDefaultBadge = document.getElementById("btnDefaultBadge");
+
+    const gradeSelect = document.getElementById("gradeSelect");
+    const btnUpGrade = document.getElementById("btnUpGrade");
+    const btnDownGrade = document.getElementById("btnDownGrade");
+
+    /* =========================
+       UI HELPERS
+    ========================= */
+    function iconFor(rank) {
+        return state.iconsById[rank.id] || rank.defaultIcon || "🏷️";
+    }
+
+    function getStagiaire(id) {
+        return state.stagiaires.find(s => s.id === id);
+    }
+
+    function getSelectedStagiaire() {
+        return getStagiaire(state.selectedStagiaireId);
+    }
+
+    function buildSelects() {
+        const s = getSelectedStagiaire();
+        if (!s) return;
+
+        const ranks = getRanksByGrade(s.grade);
+        elSelect.innerHTML = "";
+        badgeRankSelect.innerHTML = "";
+        gradeSelect.innerHTML = "";
+
+        for (const r of ranks) {
+            const o1 = document.createElement("option");
+            o1.value = r.id;
+            o1.textContent = `${iconFor(r)} ${r.label}`;
+            if (r.id === s.rankId) o1.selected = true;  // ??? IMPORTANT
+            elSelect.appendChild(o1);
+
+            const o2 = document.createElement("option");
+            o2.value = r.id;
+            o2.textContent = `${iconFor(r)} ${r.label}`;
+            badgeRankSelect.appendChild(o2);
+        }
+
+        for (const [serviceKey, grades] of Object.entries(GRADES_BY_SERVICE)) {
+            const group = document.createElement("optgroup");
+            group.label = SERVICES[serviceKey] || serviceKey;
+            for (const g of grades) {
+                const opt = document.createElement("option");
+                opt.value = g.id;
+                opt.textContent = g.label;
+                opt.selected = (g.id === s.grade);
+                group.appendChild(opt);
+            }
+            gradeSelect.appendChild(group);
+        }
+    }
+
+    function renderStagiairesList() {
+        stagiairesContainer.innerHTML = "";
+        totalStagiaires.textContent = state.stagiaires.length;
+
+        for (const s of state.stagiaires) {
+            const r = byId(s.rankId);
+            const gradeColorClass = gradeMeta(s.grade).cls;
+            const card = document.createElement("div");
+            card.className = `stagiaire-card p-3 ${state.selectedStagiaireId === s.id ? "active" : ""}`;
+            card.innerHTML = `
+                <div class="d-flex align-items-center gap-3">
+                    <span class="rank-icon">${iconFor(r)}</span>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold" style="font-size: 1.05rem;">${s.name}</div>
+                        <div class="small mb-2"><span class="grade-badge ${gradeColorClass}">${gradeLabel(s.grade)}</span></div>
+                        <div class="text-muted small">${r.label}</div>
+                    </div>
+                </div>
+            `;
+            card.addEventListener("click", () => selectStagiaire(s.id));
+            stagiairesContainer.appendChild(card);
+        }
+    }
+
+    function applyLockUI() {
+        elLockState.textContent = state.locked ? "🔒 Verrouillé" : "🔓 Déverrouillé";
+        elLockState.className = "badge " + (state.locked ? "text-bg-dark" : "text-bg-success");
+
+        const controls = [
+            btnUp, btnDown, btnMin, btnMax, elSelect,
+            badgeRankSelect, badgeInput, btnSaveBadge, btnDefaultBadge,
+            btnAddStagiaire, btnRemoveStagiaire, gradeSelect, btnUpGrade, btnDownGrade
+        ];
+        controls.forEach(c => c.disabled = state.locked);
+    }
+
+    function render() {
+        renderStagiairesList();
+
+        const s = getSelectedStagiaire();
+        if (!s) {
+            noSelection.style.display = "block";
+            editorSection.style.display = "none";
+            applyLockUI();
+            return;
+        }
+
+        noSelection.style.display = "none";
+        editorSection.style.display = "block";
+
+        const r = byId(s.rankId);
+        const gradeColorClass = gradeMeta(s.grade).cls;
+        stagiaireNameDisplay.textContent = s.name;
+        gradeBadge.textContent = gradeLabel(s.grade);
+        gradeBadge.className = `grade-badge ${gradeColorClass}`;
+        elRankBadge.textContent = r.label;
+        elRankBadge.className = `badge rounded-pill fs-6 px-4 py-2 ${r.cls}`;
+        elRankIcon.textContent = iconFor(r);
+
+        buildSelects();
+        elSelect.value = r.id;
+        badgeRankSelect.value = r.id;
+        badgeInput.value = iconFor(r);
+
+        const ranks = getRanksByGrade(s.grade);
+        const currentIdx = idxOf(s.rankId, s.grade);
+        btnDown.disabled = state.locked || (currentIdx === 0);
+        btnUp.disabled = state.locked || (currentIdx === ranks.length - 1);
+
+        const gradeList = gradeListFor(s.grade);
+        const gradeIdx = gradeList.indexOf(s.grade);
+        btnUpGrade.disabled = state.locked || (gradeIdx === gradeList.length - 1);
+        btnDownGrade.disabled = state.locked || (gradeIdx === 0);
+
+        applyLockUI();
+    }
+
+    /* =========================
+       LOGIC
+    ========================= */
+    function selectStagiaire(id) {
+        state.selectedStagiaireId = id;
+        save();
+        render();
+    }
+
+    function setRankByIndex(i) {
+        const s = getSelectedStagiaire();
+        if (!s || state.locked) return;
+        const ranks = getRanksByGrade(s.grade);
+        s.rankId = ranks[clamp(i, s.grade)].id;
+        save();
+        render();
+    }
+
+    function promote() {
+        const s = getSelectedStagiaire();
+        if (!s) return;
+        setRankByIndex(idxOf(s.rankId, s.grade) + 1);
+    }
+
+    function demote() {
+        const s = getSelectedStagiaire();
+        if (!s) return;
+        setRankByIndex(idxOf(s.rankId, s.grade) - 1);
+    }
+
+    function changeGrade(newGrade) {
+        const s = getSelectedStagiaire();
+        if (!s || state.locked || !GRADE_META[newGrade]) return;
+        s.grade = newGrade;
+        const ranks = getRanksByGrade(newGrade);
+        s.rankId = ranks[0].id;
+        save();
+        render();
+    }
+
+    function promoteGrade() {
+        const s = getSelectedStagiaire();
+        if (!s) return;
+        const gradeList = gradeListFor(s.grade);
+        const idx = gradeList.indexOf(s.grade);
+        if (idx < gradeList.length - 1) {
+            changeGrade(gradeList[idx + 1]);
+        }
+    }
+
+    function demoteGrade() {
+        const s = getSelectedStagiaire();
+        if (!s) return;
+        const gradeList = gradeListFor(s.grade);
+        const idx = gradeList.indexOf(s.grade);
+        if (idx > 0) {
+            changeGrade(gradeList[idx - 1]);
+        }
+    }
+
+    /* =========================
+       EVENTS
+    ========================= */
+    btnUnlock.addEventListener("click", () => {
+        const ok = normalizePass(elPassInput.value) === normalizePass(EDIT_PASSWORD);
+        if (ok) {
+            state.locked = false;
+            elPassInput.value = "";
+            save();
+            render();
+        } else {
+            elPassInput.select();
+            alert("❌ Mot de passe incorrect !");
+        }
+    });
+
+    btnLock.addEventListener("click", () => {
+        state.locked = true;
+        save();
+        render();
+    });
+
+    btnUp.addEventListener("click", promote);
+    btnDown.addEventListener("click", demote);
+    btnMin.addEventListener("click", () => setRankByIndex(0));
+    btnMax.addEventListener("click", () => {
+        const s = getSelectedStagiaire();
+        if (!s) return;
+        const ranks = getRanksByGrade(s.grade);
+        setRankByIndex(ranks.length - 1);
+    });
+
+    gradeSelect.addEventListener("change", (e) => {
+        const s = getSelectedStagiaire();
+        if (!s || state.locked) return;
+        changeGrade(e.target.value);
+    });
+
+    btnUpGrade.addEventListener("click", promoteGrade);
+    btnDownGrade.addEventListener("click", demoteGrade);
+
+    elSelect.addEventListener("change", (e) => {
+        const s = getSelectedStagiaire();
+        if (!s || state.locked) return;
+        s.rankId = e.target.value;
+        save();
+        render();
+    });
+
+    btnAddStagiaire.addEventListener("click", () => {
+        if (state.locked) return;
+        const name = prompt("Nom du stagiaire :");
+        if (!name) return;
+        const grade = prompt(`Grade ?\n${ALL_GRADES.map(gradeLabel).join(", ")}`, gradeLabel(DEFAULT_GRADE_ID));
+        const gradeId = Object.keys(GRADE_META).find(id => gradeLabel(id).toLowerCase() === (grade || "").toLowerCase());
+        if (!gradeId) return;
+
+        const id = "s_" + Date.now();
+        const ranks = getRanksByGrade(gradeId);
+        state.stagiaires.push({id, name: name.trim().toUpperCase(), grade: gradeId, rankId: ranks[0].id});
+        state.selectedStagiaireId = id;
+        save();
+        render();
+    });
+
+    btnRemoveStagiaire.addEventListener("click", () => {
+        if (state.locked || !state.selectedStagiaireId) return;
+        const s = getSelectedStagiaire();
+        if (!confirm(`❌ Supprimer ${s.name} ?`)) return;
+        state.stagiaires = state.stagiaires.filter(st => st.id !== state.selectedStagiaireId);
+        state.selectedStagiaireId = state.stagiaires[0]?.id || null;
+        save();
+        render();
+    });
+
+    badgeRankSelect.addEventListener("change", (e) => {
+        const r = byId(e.target.value);
+        badgeInput.value = iconFor(r);
+    });
+
+    btnSaveBadge.addEventListener("click", () => {
+        if (state.locked) return;
+        const r = byId(badgeRankSelect.value);
+        const v = (badgeInput.value || "").trim();
+        if (!v) return;
+        state.iconsById[r.id] = v;
+        save();
+        render();
+    });
+
+    btnDefaultBadge.addEventListener("click", () => {
+        if (state.locked) return;
+        const r = byId(badgeRankSelect.value);
+        delete state.iconsById[r.id];
+        save();
+        render();
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener("keydown", (e) => {
+        const tag = (document.activeElement?.tagName || "").toLowerCase();
+        const typing = tag === "input" || tag === "textarea" || tag === "select";
+        if (typing) return;
+        if (state.locked || !getSelectedStagiaire()) return;
+
+        if (e.key === "ArrowUp") {
+            e.preventDefault();
+            promote();
+        }
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            demote();
+        }
+        if (e.key === "Home") {
+            e.preventDefault();
+            setRankByIndex(0);
+        }
+        if (e.key === "End") {
+            e.preventDefault();
+            const s = getSelectedStagiaire();
+            if (s) {
+                const ranks = getRanksByGrade(s.grade);
+                setRankByIndex(ranks.length - 1);
+            }
+        }
+    });
+
+    /* =========================
+       INIT
+    ========================= */
+    load();
+    buildSelects();
+    render();
+</script>
+</body>
+</html>
+
