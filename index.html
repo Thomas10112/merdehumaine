@@ -263,6 +263,16 @@
         }
     });
 
+
+    const inputPassword = document.getElementById("passInput");
+
+    inputPassword.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            btnUnlock.click();
+        }
+
+    });
+
     btnLock.addEventListener("click", () => {
         state.locked = true;
         save();
